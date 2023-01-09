@@ -1,0 +1,3 @@
+include ':app'
+include ':multi-image-selector'
+rootProject.name = "MultiImageSelector"
