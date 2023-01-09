@@ -36,5 +36,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
     implementation project(':multi-image-selector')
+    implementation 'com.apeng:EsayPermissions:1.0.0'
+
 
 }
