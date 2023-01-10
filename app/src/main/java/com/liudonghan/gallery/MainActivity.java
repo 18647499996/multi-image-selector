@@ -55,7 +55,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        List<String> mListStr = data.getStringArrayListExtra(MultiImageSelector.EXTRA_RESULT);
-        Log.d("接收数据：", mListStr.toString());
+        if (1 == requestCode) {
+            List<String> mListStr = data.getStringArrayListExtra(MultiImageSelector.EXTRA_RESULT);
+            Log.d("接收数据：", mListStr.toString());
+        }
     }
 }
