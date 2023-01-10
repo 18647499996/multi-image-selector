@@ -1,3 +1,4 @@
 include ':multi-image'
 include ':app'
+include ':media'
 rootProject.name = "MultiImageSelector"

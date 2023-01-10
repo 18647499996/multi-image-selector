@@ -9,11 +9,14 @@ import android.util.Log;
 import android.view.View;
 
 
-import com.liudonghan.multi_image.MultiImageSelector;
+import com.liudonghan.media.utils.MediaSelector;
+import com.liudonghan.multi_image.ADMultiImageSelector;
 import com.liudonghan.multi_image.permission.LiuPermission;
 import com.liudonghan.multi_image.permission.OnPermission;
 import com.liudonghan.multi_image.permission.Permission;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -33,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
                         .request(new OnPermission() {
                             @Override
                             public void hasPermission(List<String> granted, boolean isAll) {
-                                if (isAll){
-                                    MultiImageSelector
+                                if (isAll) {
+                                    ADMultiImageSelector
                                             .create()
                                             .showCamera(true)
                                             .multi()
@@ -51,13 +54,32 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        findViewById(R.id.activity_main_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MediaSelector
+                        .get(MainActivity.this)
+                        .setMediaType(MediaSelector.PICTURE)
+                        .setMaxCount(9)
+                        .setSelectMode(MediaSelector.MODE_MULTI)
+                        .setDefaultList(new ArrayList<>(Collections.singleton("s")))
+                        .showCamera(true)
+                        .setListener(new MediaSelector.MediaSelectorListener() {
+                            @Override
+                            public void onMediaResult(List<String> resultList) {
+                                Log.i("图片列表：",resultList.toString());
+                            }
+                        })
+                        .jump();
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (1 == requestCode) {
-            List<String> mListStr = data.getStringArrayListExtra(MultiImageSelector.EXTRA_RESULT);
+            List<String> mListStr = data.getStringArrayListExtra(ADMultiImageSelector.EXTRA_RESULT);
             Log.d("接收数据：", mListStr.toString());
         }
     }

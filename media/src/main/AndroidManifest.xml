@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cmcy.medialib">
+
+    <application
+        android:requestLegacyExternalStorage="true"
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        tools:ignore="UnusedAttribute">
+
+        <!-- 图片/视频选择 -->
+        <activity
+            android:name="com.liudonghan.media.MultiSelectorActivity"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- 图片/视频预览 -->
+        <activity
+            android:name="com.liudonghan.media.PhotoPreviewActivity"
+            android:configChanges="keyboardHidden|orientation|navigation|screenSize"/>
+
+        <!-- 图片剪切 -->
+        <activity
+            android:name="com.liudonghan.media.clipimage.ClipImageActivity"
+            android:configChanges="keyboardHidden|orientation|navigation"/>
+
+    </application>
+
+</manifest>

@@ -25,7 +25,7 @@ import java.util.List;
  * 图片选择器
  * Created by nereo on 16/3/17.
  */
-public class MultiImageSelector {
+public class ADMultiImageSelector {
 
     public static final String EXTRA_RESULT = MultiImageSelectorActivity.EXTRA_RESULT;
 
@@ -33,55 +33,55 @@ public class MultiImageSelector {
     private int mMaxCount = 9;
     private int mMode = MultiImageSelectorActivity.MODE_MULTI;
     private ArrayList<String> mOriginData;
-    private static MultiImageSelector sSelector;
+    private static ADMultiImageSelector sSelector;
 
     private static final int REQUEST_STORAGE_READ_ACCESS_PERMISSION = 101;
 
 
     @Deprecated
-    private MultiImageSelector(Context context) {
+    private ADMultiImageSelector(Context context) {
 
     }
 
-    private MultiImageSelector() {
+    private ADMultiImageSelector() {
     }
 
     @Deprecated
-    public static MultiImageSelector create(Context context) {
+    public static ADMultiImageSelector create(Context context) {
         if (sSelector == null) {
-            sSelector = new MultiImageSelector(context);
+            sSelector = new ADMultiImageSelector(context);
         }
         return sSelector;
     }
 
-    public static MultiImageSelector create() {
+    public static ADMultiImageSelector create() {
         if (sSelector == null) {
-            sSelector = new MultiImageSelector();
+            sSelector = new ADMultiImageSelector();
         }
         return sSelector;
     }
 
-    public MultiImageSelector showCamera(boolean show) {
+    public ADMultiImageSelector showCamera(boolean show) {
         mShowCamera = show;
         return sSelector;
     }
 
-    public MultiImageSelector count(int count) {
+    public ADMultiImageSelector count(int count) {
         mMaxCount = count;
         return sSelector;
     }
 
-    public MultiImageSelector single() {
+    public ADMultiImageSelector single() {
         mMode = MultiImageSelectorActivity.MODE_SINGLE;
         return sSelector;
     }
 
-    public MultiImageSelector multi() {
+    public ADMultiImageSelector multi() {
         mMode = MultiImageSelectorActivity.MODE_MULTI;
         return sSelector;
     }
 
-    public MultiImageSelector origin(ArrayList<String> images) {
+    public ADMultiImageSelector origin(ArrayList<String> images) {
         mOriginData = images;
         return sSelector;
     }
