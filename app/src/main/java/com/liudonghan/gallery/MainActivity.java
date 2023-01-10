@@ -8,13 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.apeng.permissions.EsayPermissions;
-import com.apeng.permissions.OnPermission;
-import com.apeng.permissions.Permission;
+
+import com.liudonghan.multi_image.MultiImageSelector;
+import com.liudonghan.multi_image.permission.LiuPermission;
+import com.liudonghan.multi_image.permission.OnPermission;
+import com.liudonghan.multi_image.permission.Permission;
 
 import java.util.List;
 
-import me.nereo.multi_image_selector.MultiImageSelector;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.activity_main_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EsayPermissions
+                LiuPermission
                         .with(MainActivity.this)
                         .permission(Permission.WRITE_EXTERNAL_STORAGE)
                         .permission(Permission.READ_EXTERNAL_STORAGE)
