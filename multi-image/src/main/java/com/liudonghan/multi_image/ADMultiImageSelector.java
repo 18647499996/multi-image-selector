@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.liudonghan.multi_image.permission.LiuPermission;
+import com.liudonghan.multi_image.permission.ADPermission;
 import com.liudonghan.multi_image.permission.OnPermission;
 import com.liudonghan.multi_image.permission.Permission;
 
@@ -87,7 +87,7 @@ public class ADMultiImageSelector {
     }
 
     public void start(final Activity activity, final int requestCode) {
-        LiuPermission
+        ADPermission
                 .with(activity)
                 .permission(Permission.READ_EXTERNAL_STORAGE)
                 .permission(Permission.WRITE_EXTERNAL_STORAGE)
@@ -109,7 +109,7 @@ public class ADMultiImageSelector {
 
     public void start(final Fragment fragment, final int requestCode) {
         final Context context = fragment.getContext();
-        LiuPermission
+        ADPermission
                 .with(fragment.getActivity())
                 .permission(Permission.READ_EXTERNAL_STORAGE)
                 .permission(Permission.WRITE_EXTERNAL_STORAGE)

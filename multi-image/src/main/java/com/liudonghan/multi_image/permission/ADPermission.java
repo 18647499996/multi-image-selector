@@ -13,27 +13,27 @@ import java.util.List;
  * @author Created by: Li_Min
  * Time:1/9/23
  */
-public class LiuPermission {
+public class ADPermission {
 
     private Activity mActivity;
     private List<String> mPermissions = new ArrayList<>();
     private boolean mConstant;
 
-    private LiuPermission(Activity activity) {
+    private ADPermission(Activity activity) {
         mActivity = activity;
     }
 
     /**
      * 设置请求的对象
      */
-    public static LiuPermission with(Activity activity) {
-        return new LiuPermission(activity);
+    public static ADPermission with(Activity activity) {
+        return new ADPermission(activity);
     }
 
     /**
      * 设置权限组
      */
-    public LiuPermission permission(String... permissions) {
+    public ADPermission permission(String... permissions) {
         mPermissions.addAll(Arrays.asList(permissions));
         return this;
     }
@@ -41,7 +41,7 @@ public class LiuPermission {
     /**
      * 设置权限组
      */
-    public LiuPermission permission(String[]... permissions) {
+    public ADPermission permission(String[]... permissions) {
         for (String[] group : permissions) {
             mPermissions.addAll(Arrays.asList(group));
         }
@@ -51,7 +51,7 @@ public class LiuPermission {
     /**
      * 设置权限组
      */
-    public LiuPermission permission(List<String> permissions) {
+    public ADPermission permission(List<String> permissions) {
         mPermissions.addAll(permissions);
         return this;
     }
@@ -59,7 +59,7 @@ public class LiuPermission {
     /**
      * 被拒绝后继续申请，直到授权或者永久拒绝
      */
-    public LiuPermission constantRequest() {
+    public ADPermission constantRequest() {
         mConstant = true;
         return this;
     }

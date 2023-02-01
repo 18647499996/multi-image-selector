@@ -11,7 +11,7 @@ import android.view.View;
 
 import com.liudonghan.media.utils.MediaSelector;
 import com.liudonghan.multi_image.ADMultiImageSelector;
-import com.liudonghan.multi_image.permission.LiuPermission;
+import com.liudonghan.multi_image.permission.ADPermission;
 import com.liudonghan.multi_image.permission.OnPermission;
 import com.liudonghan.multi_image.permission.Permission;
 
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.activity_main_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LiuPermission
+                ADPermission
                         .with(MainActivity.this)
                         .permission(Permission.WRITE_EXTERNAL_STORAGE)
                         .permission(Permission.READ_EXTERNAL_STORAGE)
