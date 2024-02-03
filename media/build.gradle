@@ -45,4 +45,8 @@ dependencies {
     implementation 'cn.jzvd:jiaozivideoplayer:7.4.1'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 //    implementation 'com.github.cmcy:RxPermissions:1.0.1'
+    implementation 'com.squareup.picasso:picasso:2.4.0'
+    implementation 'com.github.18647499996:base:2.3.8'
+    implementation 'com.github.18647499996:utils:2.7.7'
+    implementation 'com.github.18647499996:component:3.0.9'
 }

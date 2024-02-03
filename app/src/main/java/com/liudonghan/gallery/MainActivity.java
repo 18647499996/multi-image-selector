@@ -11,9 +11,7 @@ import android.view.View;
 
 import com.liudonghan.media.utils.MediaSelector;
 import com.liudonghan.multi_image.ADMultiImageSelector;
-import com.liudonghan.multi_image.permission.ADPermission;
-import com.liudonghan.multi_image.permission.OnPermission;
-import com.liudonghan.multi_image.permission.Permission;
+import com.liudonghan.utils.ADCursorManageUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +20,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private List<ADCursorManageUtils.ImageFolderModel.MediaModel> originData = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,28 +29,22 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.activity_main_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ADPermission
-                        .with(MainActivity.this)
-                        .permission(Permission.WRITE_EXTERNAL_STORAGE)
-                        .permission(Permission.READ_EXTERNAL_STORAGE)
-                        .request(new OnPermission() {
-                            @Override
-                            public void hasPermission(List<String> granted, boolean isAll) {
-                                if (isAll) {
-                                    ADMultiImageSelector
-                                            .create()
-                                            .showCamera(true)
-                                            .multi()
-                                            .count(9)
-                                            .start(MainActivity.this, 1);
-                                }
+                ADMultiImageSelector.getInstance()
+                        .from(MainActivity.this)
+                        .title("贝米")
+                        .mediaType(ADMultiImageSelector.MediaType.Image)
+                        .mode(ADMultiImageSelector.Mode.Multiple)
+                        .showCamera(true)
+                        .maxCount(6)
+                        .origin(originData)
+                        .request(results -> {
+                            originData.clear();
+                            originData.addAll(results);
+                            for (int i = 0; i < originData.size(); i++) {
+                                Log.i("Mac_Liu", originData.get(i).getFilePath());
                             }
-
-                            @Override
-                            public void noPermission(List<String> denied, boolean quick) {
-
-                            }
-                        });
+                        })
+                        .start();
 
             }
         });
@@ -67,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         .setListener(new MediaSelector.MediaSelectorListener() {
                             @Override
                             public void onMediaResult(List<String> resultList) {
-                                Log.i("图片列表：",resultList.toString());
+                                Log.i("图片列表：", resultList.toString());
                             }
                         })
                         .jump();
@@ -78,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (1 == requestCode) {
-            List<String> mListStr = data.getStringArrayListExtra(ADMultiImageSelector.EXTRA_RESULT);
-            Log.d("接收数据：", mListStr.toString());
-        }
+//        if (1 == requestCode) {
+//            List<String> mListStr = data.getStringArrayListExtra(ADMultiImageSelector.EXTRA_RESULT);
+//            Log.d("接收数据：", mListStr.toString());
+//        }
     }
 }

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/activity_multi_media_rel_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dip_52"
+        android:background="@color/color_333333">
+
+        <ImageView
+            android:id="@+id/activity_multi_media_img_back"
+            android:layout_width="@dimen/dip_52"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/ad_back_white" />
+
+        <TextView
+            android:id="@+id/activity_multi_media_tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@id/activity_multi_media_img_back"
+            android:text="信服生活"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <com.liudonghan.view.radius.ADTextView
+            android:id="@+id/activity_multi_media_tv_succeed"
+            android:layout_width="75dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:background="@drawable/mis_action_btn"
+            android:gravity="center"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:liu_round_corner="5dp"
+            tools:text="完成(1/9)" />
+
+    </RelativeLayout>
+
+    <com.liudonghan.view.recycler.ADRecyclerView
+        android:id="@+id/activity_multi_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:liu_span_count="3"
+        app:liu_layout_manager="grid"
+        android:layout_below="@id/activity_multi_media_rel_title"/>
+
+    <RelativeLayout
+        android:id="@+id/activity_multi_media_rel"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="#cc000000"
+        android:clickable="true">
+
+        <Button
+            android:id="@+id/activity_multi_media_btn_category"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:drawableRight="@drawable/mis_text_indicator"
+            android:drawablePadding="5dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:singleLine="true"
+            android:textColor="@color/mis_folder_text_color"
+            android:textSize="16sp"
+            tools:text="所有图片" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
