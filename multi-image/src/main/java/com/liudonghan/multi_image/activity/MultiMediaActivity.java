@@ -1,6 +1,7 @@
 package com.liudonghan.multi_image.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -21,11 +23,13 @@ import com.liudonghan.multi_image.adapter.MultiMediaAdapter;
 import com.liudonghan.mvp.ADBaseActivity;
 import com.liudonghan.utils.ADArrayUtils;
 import com.liudonghan.utils.ADCursorManageUtils;
+import com.liudonghan.utils.ADPicturePhotoUtils;
 import com.liudonghan.view.radius.ADTextView;
 import com.liudonghan.view.recycler.ADRecyclerView;
 import com.liudonghan.view.snackbar.ADSnackBarManager;
 import com.liudonghan.view.title.ADTitleBuilder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +40,7 @@ import java.util.List;
  * @author Created by: Li_Min
  * Time:
  */
-public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> implements MultiMediaContract.View, BaseQuickAdapter.OnItemClickListener {
+public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> implements MultiMediaContract.View, BaseQuickAdapter.OnItemClickListener, ADPicturePhotoUtils.ADImageFileCallback {
 
     ImageView activityMultiMediaImgBack;
     ADTextView activityMultiMediaTvSucceed;
@@ -48,9 +52,18 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
     private FolderFileAdapter folderFileAdapter;
     private MultiMediaAdapter multiMediaAdapter;
     private PopupWindow listPopupWindow;
+    // 顶部返回键标题
     private String title;
+    // 最大选中数量
     private int maxCount;
+    // 1.图片 2.视频 3.图片和视频
+    private int mediaType;
+    // true 显示拍照 false 不显示
+    private boolean showCamera;
+    // 选中模式 1.多选 2.单选
+    private int mode;
     private List<ADCursorManageUtils.ImageFolderModel.MediaModel> originData = new ArrayList<>();
+    private ADPicturePhotoUtils adPicturePhotoUtils = ADPicturePhotoUtils.getInstance();
 
     @Override
     protected int getLayout() throws RuntimeException {
@@ -66,6 +79,9 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
     protected MultiMediaPresenter createPresenter() throws RuntimeException {
         title = getIntent().getStringExtra(ADMultiImageSelector.TITLE);
         maxCount = getIntent().getIntExtra(ADMultiImageSelector.MAX_COUNT, 9);
+        mediaType = getIntent().getIntExtra(ADMultiImageSelector.MEDIA_TYPE, 1);
+        showCamera = getIntent().getBooleanExtra(ADMultiImageSelector.SHOW_CAMERA, true);
+        mode = getIntent().getIntExtra(ADMultiImageSelector.MODE, 1);
         originData = (List<ADCursorManageUtils.ImageFolderModel.MediaModel>) getIntent().getSerializableExtra(ADMultiImageSelector.ORIGIN_DATA);
         return (MultiMediaPresenter) new MultiMediaPresenter(this).builder(this);
     }
@@ -73,6 +89,7 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
     @SuppressLint("SetTextI18n")
     @Override
     protected void initData(Bundle savedInstanceState) throws RuntimeException {
+        adPicturePhotoUtils.init(this).onCallBack(this);
         immersionBar.statusBarColor(R.color.color_333333).statusBarDarkFont(false).init();
         activityMultiMediaTvTitle = (TextView) findViewById(R.id.activity_multi_media_tv_title);
         activityMultiMediaImgBack = (ImageView) findViewById(R.id.activity_multi_media_img_back);
@@ -83,12 +100,15 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
 
         activityMultiMediaTvTitle.setText(title);
         activityMultiMediaTvSucceed.setText("完成(" + originData.size() + "/" + maxCount + ")");
+        activityMultiMediaTvSucceed.setVisibility(mode == 1 ? View.VISIBLE : View.GONE);
+        // 将原图片列表放置到选中列表当中
+        mPresenter.selectorMediaModel.addAll(originData);
 
         folderFileAdapter = new FolderFileAdapter(R.layout.item_ad_folder_file);
         multiMediaAdapter = new MultiMediaAdapter(R.layout.item_ad_mutli_media, this);
         activityMultiMediaRv.setAdapter(multiMediaAdapter);
         listPopupWindow = mPresenter.getListPopupWindow(this, folderFileAdapter, activityMultiMediaRel);
-        mPresenter.getMediaFile(originData);
+        mPresenter.getMediaFile(originData, mediaType);
     }
 
     @Override
@@ -103,6 +123,13 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
     @Override
     protected void onClickDoubleListener(View view) throws RuntimeException {
         if (view.getId() == R.id.activity_multi_media_btn_category) {
+            if (null == listPopupWindow) {
+                return;
+            }
+            if (listPopupWindow.isShowing()) {
+                listPopupWindow.dismiss();
+                return;
+            }
             listPopupWindow.showAsDropDown(activityMultiMediaRel);
         } else if (view.getId() == R.id.activity_multi_media_tv_succeed) {
             if (null == ADMultiImageSelector.getInstance().getOnMultiImageSelectorListener()) {
@@ -141,14 +168,14 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
     public void showMediaList(List<ADCursorManageUtils.ImageFolderModel> imageFolderModels) {
         folderFileAdapter.setNewData(imageFolderModels);
         activityMultiMediaBtnCategory.setText(imageFolderModels.get(0).getDirName());
-        multiMediaAdapter.setNewData(imageFolderModels.get(0).getMediaPath());
+        multiMediaAdapter.set(imageFolderModels.get(0), mPresenter.selectorMediaModel, showCamera);
     }
 
     @Override
     public void switchFolderFile(ADCursorManageUtils.ImageFolderModel imageFolderModel) {
         activityMultiMediaBtnCategory.setText(imageFolderModel.getDirName());
         folderFileAdapter.setSelector(imageFolderModel);
-        multiMediaAdapter.set(imageFolderModel, mPresenter.selectorMediaModel);
+        multiMediaAdapter.set(imageFolderModel, mPresenter.selectorMediaModel, showCamera);
     }
 
     @SuppressLint("SetTextI18n")
@@ -158,9 +185,40 @@ public class MultiMediaActivity extends ADBaseActivity<MultiMediaPresenter> impl
         activityMultiMediaTvSucceed.setText("完成(" + selectorMediaModel.size() + "/" + maxCount + ")");
     }
 
+    @Override
+    public void showCamera() {
+        adPicturePhotoUtils.takePicture();
+    }
+
+    @Override
+    public void showSingleSelector(List<ADCursorManageUtils.ImageFolderModel.MediaModel> selectorMediaModel) {
+
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-        mPresenter.onItemClick(adapter, view, position, listPopupWindow,maxCount);
+        mPresenter.onItemClick(adapter, view, position, listPopupWindow, maxCount, mode, this);
+    }
+
+    @Override
+    public void handleResult(File file) {
+        Log.i("Mac_Liu", "拍摄照片：" + file.getAbsolutePath());
+        mPresenter.selectorMediaModel.add(new ADCursorManageUtils.ImageFolderModel.MediaModel(
+                1,
+                file.getAbsolutePath(),
+                file.getName(),
+                file.length(),
+                file.lastModified(),
+                ADCursorManageUtils.ContentType.image,
+                0, 0, "", 0
+        ));
+        mPresenter.singleSelector(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        adPicturePhotoUtils.onActivityResult(requestCode, resultCode, data);
     }
 }

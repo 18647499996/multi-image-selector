@@ -6,6 +6,7 @@ import com.liudonghan.multi_image.activity.MultiMediaActivity;
 import com.liudonghan.utils.ADCursorManageUtils;
 import com.liudonghan.utils.ADIntentManager;
 import com.liudonghan.utils.ADPermissionManager;
+import com.liudonghan.view.snackbar.ADSnackBarManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,8 +20,11 @@ import java.util.List;
 public class ADMultiImageSelector {
 
     public static final String TITLE = "title";
-    public static final String MAX_COUNT = "maxCount";
+    public static final String MAX_COUNT = "max_count";
     public static final String ORIGIN_DATA = "origin_data";
+    public static final String MEDIA_TYPE = "media_type";
+    public static final String SHOW_CAMERA = "show_camera";
+    public static final String MODE = "mode";
 
     private Activity activity;
     private boolean showCamera = true;
@@ -43,7 +47,8 @@ public class ADMultiImageSelector {
         this.originData = new ArrayList<>();
         this.mediaType = MediaType.Image;
         this.mode = Mode.Multiple;
-        this.title = title;
+        this.title = "";
+        this.onMultiImageSelectorListener = null;
     }
 
     public static ADMultiImageSelector getInstance() {
@@ -119,13 +124,16 @@ public class ADMultiImageSelector {
                                     .putExt(TITLE, title)
                                     .putExt(MAX_COUNT, maxCount)
                                     .putExt(ORIGIN_DATA, (Serializable) originData)
+                                    .putExt(SHOW_CAMERA, showCamera)
+                                    .putExt(MODE, Mode.Multiple == mode ? 1 : 2)
+                                    .putExt(MEDIA_TYPE, MediaType.Image == mediaType ? 1 : MediaType.Video == mediaType ? 2 : 3)
                                     .builder();
                         }
                     }
 
                     @Override
                     public void noPermission(List<String> denied, boolean quick) {
-
+                        ADSnackBarManager.getInstance().showWarn(activity,"请在系统设置中打开权限");
                     }
                 });
     }
@@ -141,7 +149,8 @@ public class ADMultiImageSelector {
 
     public enum MediaType {
         Image,
-        Video
+        Video,
+        ImageOrVideo
     }
 
     public enum Mode {

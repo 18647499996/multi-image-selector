@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                         .mediaType(ADMultiImageSelector.MediaType.Image)
                         .mode(ADMultiImageSelector.Mode.Multiple)
                         .showCamera(true)
-                        .maxCount(6)
+                        .maxCount(9)
                         .origin(originData)
                         .request(results -> {
                             originData.clear();

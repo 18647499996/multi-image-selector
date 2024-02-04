@@ -3,6 +3,7 @@ package com.liudonghan.multi_image.activity;
 
 import android.graphics.Point;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.liudonghan.multi_image.ADMultiImageSelector;
 import com.liudonghan.multi_image.R;
 import com.liudonghan.multi_image.adapter.FolderFileAdapter;
 import com.liudonghan.mvp.ADBaseExceptionManager;
@@ -52,44 +54,50 @@ public class MultiMediaPresenter extends ADBaseSubscription<MultiMediaContract.V
     }
 
     @Override
-    public void getMediaFile(final List<ADCursorManageUtils.ImageFolderModel.MediaModel> originData) {
+    public void getMediaFile(final List<ADCursorManageUtils.ImageFolderModel.MediaModel> originData, final int mediaType) {
         Observable.unsafeCreate(new Observable.OnSubscribe<List<ADCursorManageUtils.ImageFolderModel>>() {
             @Override
             public void call(Subscriber<? super List<ADCursorManageUtils.ImageFolderModel>> subscriber) {
-                selectorMediaModel.addAll(originData);
-                subscriber.onNext(ADCursorManageUtils.getInstance(getContext()).getImageOrVideoFile());
+                switch (mediaType) {
+                    case 1:
+                        subscriber.onNext(ADCursorManageUtils.getInstance(getContext()).getImageFolder());
+                        break;
+                    case 2:
+                        subscriber.onNext(ADCursorManageUtils.getInstance(getContext()).getVideoFolder());
+                        break;
+                    case 3:
+                        subscriber.onNext(ADCursorManageUtils.getInstance(getContext()).getImageOrVideoFile());
+                        break;
+                    default:
+                        break;
+                }
             }
         }).doOnNext(new Action1<List<ADCursorManageUtils.ImageFolderModel>>() {
             @Override
             public void call(List<ADCursorManageUtils.ImageFolderModel> imageFolderModels) {
-                List<ADCursorManageUtils.ImageFolderModel.MediaModel> videoFile = ADCursorManageUtils.getInstance(getContext()).getVideoFile();
-                List<ADCursorManageUtils.ImageFolderModel.MediaModel> imageFile = ADCursorManageUtils.getInstance(getContext()).getImageFile();
-                if (!ADArrayUtils.isEmpty(videoFile)) {
-                    ADCursorManageUtils.ImageFolderModel imageFolderModel = new ADCursorManageUtils.ImageFolderModel();
-                    imageFolderModel.setMediaPath(videoFile);
-                    imageFolderModel.setDirName("所有视频");
-                    imageFolderModel.setDirPath("");
-                    imageFolderModel.setFileCount(videoFile.size());
-                    imageFolderModel.setCoverPath(videoFile.get(0).getFilePath());
-                    imageFolderModels.add(0, imageFolderModel);
+                if (mediaType == 1 || mediaType == 3) {
+                    List<ADCursorManageUtils.ImageFolderModel.MediaModel> imageFile = ADCursorManageUtils.getInstance(getContext()).getImageFile();
+                    if (!ADArrayUtils.isEmpty(imageFile)) {
+                        ADCursorManageUtils.ImageFolderModel videoFolderModel = new ADCursorManageUtils.ImageFolderModel();
+                        videoFolderModel.setMediaPath(imageFile);
+                        videoFolderModel.setDirName("所有图片");
+                        videoFolderModel.setDirPath("");
+                        videoFolderModel.setSelect(true);
+                        videoFolderModel.setFileCount(imageFile.size());
+                        videoFolderModel.setCoverPath(imageFile.get(0).getFilePath());
+                        imageFolderModels.add(0, videoFolderModel);
+                    }
                 }
-                if (!ADArrayUtils.isEmpty(imageFile)) {
-                    ADCursorManageUtils.ImageFolderModel videoFolderModel = new ADCursorManageUtils.ImageFolderModel();
-                    videoFolderModel.setMediaPath(imageFile);
-                    videoFolderModel.setDirName("所有图片");
-                    videoFolderModel.setDirPath("");
-                    videoFolderModel.setSelect(true);
-                    videoFolderModel.setFileCount(imageFile.size());
-                    videoFolderModel.setCoverPath(imageFile.get(0).getFilePath());
-                    imageFolderModels.add(0, videoFolderModel);
-                }
-                for (int i = 0; i < imageFolderModels.size(); i++) {
-                    for (int j = 0; j < imageFolderModels.get(i).getMediaPath().size(); j++) {
-                        for (int k = 0; k < selectorMediaModel.size(); k++) {
-                            if (imageFolderModels.get(i).getMediaPath().get(j).getFilePath().equals(selectorMediaModel.get(k).getFilePath())) {
-                                imageFolderModels.get(i).getMediaPath().get(j).setSelector(true);
-                            }
-                        }
+                if (mediaType == 2 || mediaType == 3) {
+                    List<ADCursorManageUtils.ImageFolderModel.MediaModel> videoFile = ADCursorManageUtils.getInstance(getContext()).getVideoFile();
+                    if (!ADArrayUtils.isEmpty(videoFile)) {
+                        ADCursorManageUtils.ImageFolderModel imageFolderModel = new ADCursorManageUtils.ImageFolderModel();
+                        imageFolderModel.setMediaPath(videoFile);
+                        imageFolderModel.setDirName("所有视频");
+                        imageFolderModel.setDirPath("");
+                        imageFolderModel.setFileCount(videoFile.size());
+                        imageFolderModel.setCoverPath(videoFile.get(0).getFilePath());
+                        imageFolderModels.add(0, imageFolderModel);
                     }
                 }
             }
@@ -132,29 +140,55 @@ public class MultiMediaPresenter extends ADBaseSubscription<MultiMediaContract.V
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void onItemClick(BaseQuickAdapter adapter, View views, int position, PopupWindow listPopupWindow, int maxCount) {
+    public void onItemClick(BaseQuickAdapter adapter, View views, int position, PopupWindow listPopupWindow, int maxCount, int mode, MultiMediaActivity multiMediaActivity) {
         if (adapter instanceof FolderFileAdapter) {
             listPopupWindow.dismiss();
             ADCursorManageUtils.ImageFolderModel imageFolderModel = (ADCursorManageUtils.ImageFolderModel) adapter.getItem(position);
             view.switchFolderFile(imageFolderModel);
         } else {
             ADCursorManageUtils.ImageFolderModel.MediaModel mediaModel = (ADCursorManageUtils.ImageFolderModel.MediaModel) adapter.getItem(position);
-            if (selectorMediaModel.contains(mediaModel)) {
-                selectorMediaModel.remove(mediaModel);
-            } else {
-                if (!ADArrayUtils.isEmpty(selectorMediaModel)) {
-                    // 只能选择相同类型的媒体文件
-                    if (!Objects.requireNonNull(mediaModel).getContentType().name().equals(selectorMediaModel.get(0).getContentType().name())) {
-                        return;
-                    }
-                }
+            if (-1 == Objects.requireNonNull(mediaModel).getId()) {
+                // 拍照
                 if (selectorMediaModel.size() == maxCount) {
-                    ADSnackBarManager.getInstance().showWarn(getContext(),"超出最大限制");
+                    ADSnackBarManager.getInstance().showWarn(getContext(), "超出最大限制");
                     return;
                 }
-                selectorMediaModel.add(mediaModel);
+                view.showCamera();
+            } else {
+                if (mode == 2) {
+                    // 单选
+                    selectorMediaModel.add(mediaModel);
+                    singleSelector(multiMediaActivity);
+                    return;
+                }
+                // 多选
+                if (selectorMediaModel.contains(mediaModel)) {
+                    selectorMediaModel.remove(mediaModel);
+                } else {
+
+                    if (selectorMediaModel.size() == maxCount) {
+                        ADSnackBarManager.getInstance().showWarn(getContext(), "超出最大限制");
+                        return;
+                    }
+                    selectorMediaModel.add(mediaModel);
+                }
+                view.showSelectorMediaFile(mediaModel, position, selectorMediaModel);
             }
-            view.showSelectorMediaFile(mediaModel, position, selectorMediaModel);
         }
+    }
+
+    @Override
+    public void singleSelector(MultiMediaActivity multiMediaActivity) {
+        if (null == ADMultiImageSelector.getInstance().getOnMultiImageSelectorListener()) {
+            Log.i("Mac_Liu", "Please set the callback function");
+            multiMediaActivity.finish();
+            return;
+        }
+        if (ADArrayUtils.isEmpty(selectorMediaModel)) {
+            ADSnackBarManager.getInstance().showWarn(getContext(), "请选择多媒体文件或图片");
+            return;
+        }
+        ADMultiImageSelector.getInstance().getOnMultiImageSelectorListener().onMediaResult(selectorMediaModel);
+        multiMediaActivity.finish();
     }
 }
